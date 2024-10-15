@@ -6,13 +6,11 @@ kramdown:
   hard_wrap: false
 plugins:
   - jekyll-paginate
-paginate: 10
-paginate_path: "/page:num/"
 defaults:
   - scope:
       path: ""
-      type: "pages"
     values:
       layout: "default"
 baseurl: ""
 url: "https://momotaro1105.github.io"
+permalink: pretty

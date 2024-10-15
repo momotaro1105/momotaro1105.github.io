@@ -1,0 +1,13 @@
+---
+layout: default
+title: Test Page
+permalink: /test/index.html
+---
+
+<h1>Test Page</h1>
+<p>ID: <span id="user-id"></span></p>
+
+<script>
+    const userId = window.location.pathname.split('/').pop();
+    document.getElementById('user-id').textContent = userId;
+</script>
