@@ -1,15 +1,18 @@
 let posts = [];
 
+// Function to get user ID from URL
 function getUserIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
+    console.log("URL search params:", urlParams.toString());
     const userId = urlParams.get('userId');
+    console.log("Retrieved userId:", userId);
     if (!userId) {
         console.error('No userId found in URL');
-        // You might want to handle this case, perhaps by redirecting to an error page
     }
     return userId;
 }
 
+// Function to fetch posts from the API
 async function getPosts(params = {}) {
     const userId = getUserIdFromUrl();
     if (!userId) {
@@ -18,6 +21,7 @@ async function getPosts(params = {}) {
     params.userId = userId;
     const queryString = new URLSearchParams(params).toString();
     const url = `${API_BASE_URL}/posts${queryString ? `?${queryString}` : ''}`;
+    console.log("Fetching from URL:", url);
 
     try {
         const response = await fetch(url);
@@ -25,7 +29,10 @@ async function getPosts(params = {}) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const responseText = await response.text();
-        console.log("Raw response:", responseText);
+        console.log("Raw response text:", responseText);
+        if (!responseText) {
+            throw new Error('Empty response from server');
+        }
         return JSON.parse(responseText);
     } catch (error) {
         console.error("Error fetching or parsing posts:", error);
@@ -33,6 +40,7 @@ async function getPosts(params = {}) {
     }
 }
 
+// Function to create a post element for display
 function createPostElement(post) {
     const postElement = document.createElement('div');
     postElement.className = `post-card ${post.idea_text ? 'idea' : 'problem'}`;
@@ -63,27 +71,31 @@ function createPostElement(post) {
     return postElement;
 }
 
+// Function to render posts on the page
 async function renderPosts() {
     try {
         const response = await getPosts();
-        console.log("Full response object:", response);
+        console.log("Parsed response:", response);
 
-        const parsedBody = JSON.parse(response.body);
-        posts = parsedBody.items;
+        if (!response || !response.items) {
+            throw new Error('Unexpected response structure');
+        }
+
+        posts = response.items;
 
         if (!Array.isArray(posts)) {
-            console.error('Unexpected data structure:', parsedBody);
-            return;
+            throw new Error('Posts is not an array');
         }
 
         const postList = document.querySelector('.post-list');
-        postList.innerHTML = '';
+        postList.innerHTML = ''; // Clear existing posts
 
         if (posts.length === 0) {
             postList.innerHTML = '<p>No more posts available.</p>';
             return;
         }
 
+        // Create and append each post element to the list
         posts.forEach(post => {
             const postElement = createPostElement(post);
             postList.appendChild(postElement);
@@ -96,28 +108,16 @@ async function renderPosts() {
             console.error('initializeSwipeCards function not found');
         }
 
-        // Display raw API response
-        const apiResponseElement = document.getElementById('api-response');
-        if (apiResponseElement) {
-            apiResponseElement.textContent = JSON.stringify(parsedBody, null, 2);
-        }
-
     } catch (error) {
         console.error("Error rendering posts:", error);
         const container = document.querySelector('.post-list');
         if (container) {
-            container.innerHTML = '<p>Error loading posts. Please try again later.</p>';
+            container.innerHTML = `<p>Error loading posts: ${error.message}</p>`;
         }
     }
 }
 
-// Attach fetchPosts to window object
-window.fetchPosts = function (userId) {
-    // Ensure renderPosts is only called once
-    if (!window.postsRendered) {
-        renderPosts();
-        window.postsRendered = true;
-    }
+// Attach fetchPosts to window object for external calls
+window.fetchPosts = function () {
+    renderPosts();
 };
-
-// Remove the DOMContentLoaded event listener
