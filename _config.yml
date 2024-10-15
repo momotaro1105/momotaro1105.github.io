@@ -20,3 +20,5 @@ defaults:
     values:
       layout: "default"
 permalink: /:title/
+baseurl: ""
+url: "https://momotaro1105.github.io"

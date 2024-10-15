@@ -1,7 +1,7 @@
 ---
 layout: default
 title: 問題とアイデアをスワイプ
-permalink: /swipe/:userId
+permalink: /swipe/*
 ---
 
 <div id="swipe-container">
@@ -14,13 +14,13 @@ permalink: /swipe/:userId
 
 <div id="reason-dialog" class="dialog">
     <div class="dialog-content">
-        <h2>なぜこの投稿が気に入らないのですか？</h2>
+        <h2>理由を選択</h2>
         <div id="reason-buttons"></div>
     </div>
 </div>
 
 <script>
-    const userId = '{{ page.userId }}';
+    const userId = window.location.pathname.split('/').pop();
     if (!userId) {
         console.error('URLにuserIdが見つかりません');
         // You might want to redirect to an error page or handle this case
