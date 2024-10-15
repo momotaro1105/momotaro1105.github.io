@@ -1,0 +1,20 @@
+---
+layout: default
+title: あなたのマッチ
+---
+
+<div id="matches-container">
+    <h1>あなたのマッチ</h1>
+    <div class="matches-list">
+        <!-- Matches will be dynamically loaded here -->
+    </div>
+</div>
+
+<script>
+    const userId = new URLSearchParams(window.location.search).get('userId');
+    if (!userId) {
+        console.error('URLにuserIdが見つかりません');
+        // You might want to redirect to an error page or handle this case
+    }
+</script>
+<script src="{{ '/assets/js/fetch-matches.js' | relative_url }}"></script>

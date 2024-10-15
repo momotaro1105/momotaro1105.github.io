@@ -13,3 +13,4 @@ collections:
     output: true
   ideas:
     output: true
+permalink: /:categories/:year/:month/:day/:title/

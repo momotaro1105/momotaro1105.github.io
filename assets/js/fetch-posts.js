@@ -2,7 +2,22 @@ const API_BASE_URL = 'https://jighvu1u6c.execute-api.ap-northeast-1.amazonaws.co
 
 let posts = [];
 
+function getUserIdFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('userId');
+    if (!userId) {
+        console.error('No userId found in URL');
+        // You might want to handle this case, perhaps by redirecting to an error page
+    }
+    return userId;
+}
+
 async function getPosts(params = {}) {
+    const userId = getUserIdFromUrl();
+    if (!userId) {
+        throw new Error('User ID is required');
+    }
+    params.userId = userId;
     const queryString = new URLSearchParams(params).toString();
     const url = `${API_BASE_URL}/posts${queryString ? `?${queryString}` : ''}`;
 
@@ -53,17 +68,20 @@ async function renderPosts() {
         const response = await getPosts();
         console.log("Full API Response:", response);
 
-        const bodyData = JSON.parse(response.body);
-        console.log("Parsed body data:", bodyData);
-
-        posts = bodyData.items;
+        posts = response.items;
         if (!Array.isArray(posts)) {
-            console.error('Unexpected data structure:', bodyData);
+            console.error('Unexpected data structure:', response);
             return;
         }
 
         const postList = document.querySelector('.post-list');
         postList.innerHTML = '';
+
+        if (posts.length === 0) {
+            postList.innerHTML = '<p>No more posts available.</p>';
+            return;
+        }
+
         posts.forEach(post => {
             const postElement = createPostElement(post);
             postList.appendChild(postElement);

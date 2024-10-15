@@ -1,0 +1,30 @@
+---
+layout: default
+title: 問題とアイデアをスワイプ
+---
+
+<div id="swipe-container">
+    <div class="post-list">
+        <!-- Posts will be dynamically loaded here -->
+    </div>
+    <div id="thumbs-up" class="feedback-icon">👍</div>
+    <div id="thumbs-down" class="feedback-icon">👎</div>
+</div>
+
+<div id="reason-dialog" class="dialog">
+    <div class="dialog-content">
+        <h2>なぜこの投稿が気に入らないのですか？</h2>
+        <div id="reason-buttons"></div>
+    </div>
+</div>
+
+<script>
+    const userId = new URLSearchParams(window.location.search).get('userId');
+    if (!userId) {
+        console.error('URLにuserIdが見つかりません');
+        // You might want to redirect to an error page or handle this case
+    }
+</script>
+<script src="{{ '/assets/js/fetch-posts.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/swipe-cards.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/vote-posts.js' | relative_url }}"></script>
