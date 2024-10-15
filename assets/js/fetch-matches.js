@@ -36,23 +36,55 @@ function displayMatches(matches) {
 
 function createMatchElement(match) {
     const matchElement = document.createElement('div');
-    matchElement.className = 'match-item';
-
-    const typeText = match.type === 'idea' ? 'アイデア' : '課題';
-    const matchText = match.type === 'idea' ? match.idea_text : match.problem_text;
+    matchElement.className = 'match-item swipeable';
 
     matchElement.innerHTML = `
-        <h3>${typeText}: ${matchText}</h3>
-        <p>マッチ度: ${match.match_score}%</p>
-        <div class="tags-container">
-            ${match.categories ? match.categories.map(category => `
-                <span class="tag category-tag">#${category}</span>
-            `).join('') : ''}
-            ${match.keywords ? match.keywords.map(keyword => `
-                <span class="tag keyword-tag">#${keyword}</span>
-            `).join('') : ''}
+        <div class="card-content">
+            <div class="problem-section">
+                <h3>あなたの課題</h3>
+                <p>${match.problem.problem_text}</p>
+            </div>
+            <div class="idea-section">
+                <h3>誰かの妄想</h3>
+                <p>${match.idea.idea_text}</p>
+            </div>
+            <p class="match-score">❤️: ${(match.match_score * 100).toFixed(2)}%</p>
+            <div class="tags-container">
+                ${match.problem.categories ? match.problem.categories.map(category => `
+                    <span class="tag category-tag">#${category}</span>
+                `).join('') : ''}
+                ${match.problem.keywords ? match.problem.keywords.map(keyword => `
+                    <span class="tag keyword-tag">#${keyword}</span>
+                `).join('') : ''}
+            </div>
         </div>
     `;
+
+    let startX;
+    let currentX;
+
+    matchElement.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+    });
+
+    matchElement.addEventListener('touchmove', (e) => {
+        currentX = e.touches[0].clientX;
+        const diffX = currentX - startX;
+        matchElement.style.transform = `translateX(${diffX}px)`;
+    });
+
+    matchElement.addEventListener('touchend', () => {
+        const diffX = currentX - startX;
+        if (Math.abs(diffX) > 100) {
+            // Swipe threshold
+            matchElement.style.transition = 'transform 0.3s ease-out';
+            matchElement.style.transform = `translateX(${diffX > 0 ? '100%' : '-100%'})`;
+            setTimeout(() => matchElement.remove(), 300);
+        } else {
+            matchElement.style.transition = 'transform 0.3s ease-out';
+            matchElement.style.transform = 'translateX(0)';
+        }
+    });
 
     return matchElement;
 }
