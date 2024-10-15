@@ -1,6 +1,7 @@
 ---
 layout: default
 title: 問題とアイデアをスワイプ
+permalink: /swipe/:userId
 ---
 
 <div id="swipe-container">
@@ -19,7 +20,7 @@ title: 問題とアイデアをスワイプ
 </div>
 
 <script>
-    const userId = new URLSearchParams(window.location.search).get('userId');
+    const userId = '{{ page.userId }}';
     if (!userId) {
         console.error('URLにuserIdが見つかりません');
         // You might want to redirect to an error page or handle this case

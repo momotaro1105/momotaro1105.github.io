@@ -13,4 +13,10 @@ collections:
     output: true
   ideas:
     output: true
-permalink: /:categories/:year/:month/:day/:title/
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+permalink: /:title/
