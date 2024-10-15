@@ -1,0 +1,21 @@
+<div class="bg-white border border-gray-200 shadow-sm rounded-lg p-4 mb-4 flex flex-col h-[200px]">
+    <div class="flex justify-between items-start mb-2">
+        <span class="inline-block bg-red-100 text-red-800 rounded-full px-2 py-1 text-xs font-semibold mr-2">
+            {{ post.type }}
+        </span>
+        <span class="inline-flex items-center text-sm text-gray-600">
+            <span class="font-bold text-green-600 mr-1">👤</span>
+            <span>{{ post.votes }}</span>
+        </span>
+    </div>
+    <p class="text-lg mb-4 flex-grow overflow-hidden">
+        <span class="line-clamp-3">{{ post.content }}</span>
+    </p>
+    <div class="mt-auto">
+        {% for tag in post.tags %}
+        <span class="inline-block bg-gray-100 text-gray-800 rounded-full px-3 py-1 text-sm font-semibold mr-2 mb-2">
+            #{{ tag }}
+        </span>
+        {% endfor %}
+    </div>
+</div>

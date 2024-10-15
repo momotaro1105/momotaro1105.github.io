@@ -1,0 +1,15 @@
+title: PURPOSE
+description: 妄想を地域課題とマッチング
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+plugins:
+  - jekyll-paginate
+paginate: 10
+paginate_path: "/page:num/"
+collections:
+  problems:
+    output: true
+  ideas:
+    output: true

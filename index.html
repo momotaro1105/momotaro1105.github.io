@@ -1,0 +1,25 @@
+---
+layout: default
+title: Home
+---
+
+<div class="container">
+    <h1>最新の下北投稿</h1>
+
+    <div class="post-list">
+        <!-- Posts will be dynamically loaded here -->
+    </div>
+
+    <div id="thumbs-up" class="feedback-icon">👍</div>
+    <div id="thumbs-down" class="feedback-icon">👎</div>
+    <div id="reason-dialog" class="dialog">
+        <div class="dialog-content">
+            <h2>理由を選択</h2>
+            <div id="reason-buttons"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+<script src="{{ '/assets/js/fetch-posts.js' | relative_url }}"></script>
+<script src="{{ '/assets/js/swipe-cards.js' | relative_url }}"></script>
