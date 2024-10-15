@@ -8,17 +8,11 @@ plugins:
   - jekyll-paginate
 paginate: 10
 paginate_path: "/page:num/"
-collections:
-  problems:
-    output: true
-  ideas:
-    output: true
 defaults:
   - scope:
       path: ""
       type: "pages"
     values:
       layout: "default"
-permalink: /:title/
 baseurl: ""
 url: "https://momotaro1105.github.io"
