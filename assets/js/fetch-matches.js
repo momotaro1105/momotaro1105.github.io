@@ -1,5 +1,3 @@
-const API_BASE_URL = 'https://jighvu1u6c.execute-api.ap-northeast-1.amazonaws.com/dev';
-
 async function fetchMatches() {
     const userId = new URLSearchParams(window.location.search).get('userId');
     if (!userId) {

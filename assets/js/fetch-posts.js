@@ -1,5 +1,3 @@
-const API_BASE_URL = 'https://jighvu1u6c.execute-api.ap-northeast-1.amazonaws.com/dev';
-
 let posts = [];
 
 function getUserIdFromUrl() {
@@ -26,9 +24,11 @@ async function getPosts(params = {}) {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        return await response.json();
+        const responseText = await response.text();
+        console.log("Raw response:", responseText);
+        return JSON.parse(responseText);
     } catch (error) {
-        console.error("Could not fetch posts:", error);
+        console.error("Error fetching or parsing posts:", error);
         throw error;
     }
 }
@@ -66,11 +66,13 @@ function createPostElement(post) {
 async function renderPosts() {
     try {
         const response = await getPosts();
-        console.log("Full API Response:", response);
+        console.log("Full response object:", response);
 
-        posts = response.items;
+        const parsedBody = JSON.parse(response.body);
+        posts = parsedBody.items;
+
         if (!Array.isArray(posts)) {
-            console.error('Unexpected data structure:', response);
+            console.error('Unexpected data structure:', parsedBody);
             return;
         }
 
@@ -88,12 +90,16 @@ async function renderPosts() {
         });
 
         // Initialize swipe functionality
-        initializeSwipeCards();
+        if (typeof window.initializeSwipeCards === 'function') {
+            window.initializeSwipeCards();
+        } else {
+            console.error('initializeSwipeCards function not found');
+        }
 
         // Display raw API response
         const apiResponseElement = document.getElementById('api-response');
         if (apiResponseElement) {
-            apiResponseElement.textContent = JSON.stringify(response, null, 2);
+            apiResponseElement.textContent = JSON.stringify(parsedBody, null, 2);
         }
 
     } catch (error) {
@@ -105,4 +111,13 @@ async function renderPosts() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', renderPosts);
+// Attach fetchPosts to window object
+window.fetchPosts = function (userId) {
+    // Ensure renderPosts is only called once
+    if (!window.postsRendered) {
+        renderPosts();
+        window.postsRendered = true;
+    }
+};
+
+// Remove the DOMContentLoaded event listener

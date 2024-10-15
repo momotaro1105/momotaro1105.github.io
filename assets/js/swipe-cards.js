@@ -33,7 +33,10 @@ function initializeSwipeCards() {
     function resetCardPosition() {
         const card = cards[currentIndex];
         card.style.transition = 'transform 0.3s ease';
-        card.style.transform = '';
+        card.style.transform = 'translate(0, 0) rotate(0deg)';
+        setTimeout(() => {
+            card.style.transition = '';
+        }, 300);
     }
 
     function animateSwipe(direction) {
@@ -43,15 +46,7 @@ function initializeSwipeCards() {
         card.style.transition = 'transform 0.5s ease';
         card.style.transform = `translateX(${swipeOutDistance}px) rotate(${direction === 'right' ? 20 : -20}deg)`;
 
-        showFeedbackIcon(direction);
-
-        setTimeout(() => {
-            card.style.display = 'none';
-            card.style.transform = '';
-            card.style.transition = '';
-            currentIndex = (currentIndex + 1) % cards.length;
-            updateCardPositions();
-        }, 500);
+        window.handleVote(direction);
     }
 
     function onDragStart(e) {
@@ -80,14 +75,9 @@ function initializeSwipeCards() {
         if (Math.abs(deltaX) > window.innerWidth * 0.4) {
             const direction = deltaX > 0 ? 'right' : 'left';
             animateSwipe(direction);
-            window.handleVote(direction); // Call the voting function
         } else {
             resetCardPosition();
         }
-
-        setTimeout(() => {
-            isDragging = false;
-        }, 100);
     }
 
     postList.addEventListener('mousedown', onDragStart);
@@ -98,7 +88,12 @@ function initializeSwipeCards() {
     postList.addEventListener('touchend', onDragEnd);
 
     updateCardPositions();
+
+    window.resetCardPosition = resetCardPosition;
+    window.moveToNextCard = function () {
+        currentIndex++;
+        updateCardPositions();
+    };
 }
 
-// This function will be called from fetch-posts.js after the posts are loaded
 window.initializeSwipeCards = initializeSwipeCards;

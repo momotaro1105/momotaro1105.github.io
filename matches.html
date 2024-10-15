@@ -1,7 +1,7 @@
 ---
 layout: default
 title: あなたのマッチ
-permalink: /matches/:userId
+permalink: /matches/
 ---
 
 <div id="matches-container">
@@ -12,10 +12,24 @@ permalink: /matches/:userId
 </div>
 
 <script>
-    const userId = '{{ page.userId }}';
-    if (!userId) {
-        console.error('URLにuserIdが見つかりません');
-        // You might want to redirect to an error page or handle this case
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('userId');
+
+        console.log('User ID:', userId);
+        if (!userId) {
+            console.error('URLにuserIdが見つかりません');
+            // You might want to redirect to an error page or handle this case
+        } else {
+            // Call the function to fetch matches
+            if (typeof window.fetchMatches === 'function') {
+                window.fetchMatches(userId);
+            } else {
+                console.error('fetchMatches function not found');
+            }
+        }
+    });
 </script>
+
+<script src="{{ '/assets/js/config.js' | relative_url }}"></script>
 <script src="{{ '/assets/js/fetch-matches.js' | relative_url }}"></script>

@@ -1,5 +1,3 @@
-const API_BASE_URL = 'https://jighvu1u6c.execute-api.ap-northeast-1.amazonaws.com/dev';
-
 const reasons = {
     problem: [
         'あまり課題と感じない',
@@ -47,8 +45,10 @@ async function sendVote(postId, postType, voteType, reason = null) {
         }
 
         console.log(`Vote recorded: ${voteType} for post ${postId}`);
+        return true;
     } catch (error) {
         console.error("Error recording vote:", error);
+        return false;
     }
 }
 
@@ -66,10 +66,16 @@ function showReasonDialog(postType) {
     reasonDialog.style.display = 'flex';
 }
 
-function handleReasonSelect(reason) {
+async function handleReasonSelect(reason) {
     console.log('Selected reason:', reason);
+    const success = await sendVote(currentPostId, currentPostType, 'downvote', reason);
     hideReasonDialog();
-    sendVote(currentPostId, currentPostType, 'downvote', reason);
+    if (success) {
+        showFeedbackIcon('left');
+        window.moveToNextCard();
+    } else {
+        window.resetCardPosition();
+    }
 }
 
 function hideReasonDialog() {
@@ -79,28 +85,45 @@ function hideReasonDialog() {
     }
 }
 
-// This function will be called from swipe-cards.js
-window.handleVote = function (direction) {
+function showFeedbackIcon(direction) {
+    const icon = document.getElementById(direction === 'right' ? 'thumbs-up' : 'thumbs-down');
+    icon.classList.add('show');
+    setTimeout(() => {
+        icon.classList.remove('show');
+    }, 1000);
+}
+
+window.handleVote = async function (direction) {
     const currentCard = document.querySelector('.post-card:not([style*="display: none"])');
+    if (!currentCard) {
+        console.error('No visible card found');
+        return;
+    }
+
     currentPostId = currentCard.dataset.postId;
     currentPostType = currentCard.dataset.postType;
 
     if (direction === 'right') {
-        sendVote(currentPostId, currentPostType, 'upvote');
+        const success = await sendVote(currentPostId, currentPostType, 'upvote');
+        if (success) {
+            showFeedbackIcon('right');
+            window.moveToNextCard();
+        } else {
+            window.resetCardPosition();
+        }
     } else {
         showReasonDialog(currentPostType);
     }
 };
 
-// Close reason dialog when clicking outside
 document.addEventListener('click', function (event) {
     const reasonDialog = document.getElementById('reason-dialog');
     if (reasonDialog && event.target === reasonDialog) {
         hideReasonDialog();
+        window.resetCardPosition();
     }
 });
 
-// Prevent closing when clicking inside the dialog content
 document.addEventListener('DOMContentLoaded', function () {
     const reasonDialog = document.getElementById('reason-dialog');
     if (reasonDialog) {
