@@ -82,6 +82,7 @@ async function renderMatches(userId) {
 
         // Create and append each match element to the list
         matches.forEach(match => {
+            console.log("Current match object:", match);
             const matchElement = createMatchElement(match);
             matchesList.appendChild(matchElement);
         });
@@ -156,15 +157,25 @@ function initializeSwipeCards() {
                 card.style.transition = 'transform 0.5s ease';
                 card.style.transform = `translate(${direction === 'right' ? '150%' : '-150%'}, ${moveY - startY}px) rotate(${deltaX * 0.1}deg)`;
 
+                const userId = getUserIdFromUrl();
+                const matchIndex = Array.from(card.parentNode.children).indexOf(card);
+                const match = matches[matchIndex];
+                const problemId = match.problem.problem_id;
+                const ideaId = match.idea.idea_id;
+
                 if (direction === 'right') {
                     showFeedbackIcon(direction);
-                    currentIndex++;
-                    setTimeout(() => {
-                        card.style.display = 'none';
-                        updateCardPositions();
-                    }, 500);
+                    postMatchInteraction(userId, problemId, ideaId, 'right')
+                        .then(() => {
+                            setTimeout(() => {
+                                card.style.display = 'none';
+                                currentCard = null;
+                                updateCardPositions();
+                            }, 500);
+                        })
+                        .catch(error => console.error("Error posting match interaction:", error));
                 } else {
-                    showMatchReasonDialog();
+                    showMatchReasonDialog(userId, problemId, ideaId);
                 }
             } else {
                 resetCardPosition(card);
@@ -184,13 +195,13 @@ function initializeSwipeCards() {
     updateCardPositions();
 }
 
-function showMatchReasonDialog() {
+function showMatchReasonDialog(userId, problemId, ideaId) {
     const reasonDialog = document.getElementById('match-reason-dialog');
     const reasonButtons = document.getElementById('match-reason-buttons');
     reasonButtons.innerHTML = '';
 
     const reasons = [
-        '課題の解決にならない',
+        '解決しない',
         '実現性が低い',
         '解決済み',
         'その他'
@@ -200,25 +211,50 @@ function showMatchReasonDialog() {
         const button = document.createElement('button');
         button.className = 'reason-btn';
         button.textContent = reason;
-        button.onclick = () => handleMatchReasonSelect(reason);
+        button.onclick = () => handleMatchReasonSelect(reason, userId, problemId, ideaId);
         reasonButtons.appendChild(button);
     });
 
     reasonDialog.style.display = 'flex';
 }
 
-function handleMatchReasonSelect(reason) {
+function handleMatchReasonSelect(reason, userId, problemId, ideaId) {
     console.log('Selected reason for match:', reason);
     hideMatchReasonDialog();
     if (currentCard) {
-        showFeedbackIcon('left'); // This should now work
+        showFeedbackIcon('left');
         currentCard.style.transition = 'transform 0.5s ease';
         currentCard.style.transform = 'translate(-150%, 0) rotate(-10deg)';
-        setTimeout(() => {
-            currentCard.style.display = 'none';
-            currentCard = null;
-            updateCardPositions();
-        }, 500);
+
+        postMatchInteraction(userId, problemId, ideaId, 'left', reason)
+            .then(() => {
+                setTimeout(() => {
+                    currentCard.style.display = 'none';
+                    currentCard = null;
+                    updateCardPositions();
+                }, 500);
+            })
+            .catch(error => console.error("Error posting match interaction:", error));
+    }
+}
+
+function handleMatchReasonSelect(reason, userId, problemId, ideaId) {
+    console.log('Selected reason for match:', reason);
+    hideMatchReasonDialog();
+    if (currentCard) {
+        showFeedbackIcon('left');
+        currentCard.style.transition = 'transform 0.5s ease';
+        currentCard.style.transform = 'translate(-150%, 0) rotate(-10deg)';
+
+        postMatchInteraction(userId, problemId, ideaId, 'left', reason)
+            .then(() => {
+                setTimeout(() => {
+                    currentCard.style.display = 'none';
+                    currentCard = null;
+                    updateCardPositions();
+                }, 500);
+            })
+            .catch(error => console.error("Error posting match interaction:", error));
     }
 }
 
